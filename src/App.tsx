@@ -1,25 +1,39 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {useState} from 'react';
+import styled from 'styled-components/macro'
+import {useJSONPlaceholder} from './share/useJSONPlaceholder';
+import {indexUsers} from './user/user';
+import {Post} from './post/post';
+import PostList from './post/PostList';
+import PostItem from './post/PostItem';
+import CommentList from './comment/CommentList';
+
+const Info = styled.section`
+  height: 100%;
+  padding: 1em;
+  background-color: ${({theme: {textBGColor}}) => textBGColor};
+`;
 
 const App: React.FC = () => {
+  const users = useJSONPlaceholder('users', {}, indexUsers);
+  const [post, setPost] = useState<Post | null>();
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <main>
+      <div hidden={Boolean(post)}>
+        <PostList users={users} setPost={setPost} />
+      </div>
+      {post &&
+        <Info>
+          <div>
+            <button onClick={() => setPost(null)}>
+              <span role="img" aria-label="go back">⬅️</span> Go back
+            </button>
+          </div>
+          <br />
+          <PostItem post={post} user={users[post.userId]} />
+          <CommentList postId={post.id} />
+        </Info>
+      }
+    </main>
   );
 }
 
